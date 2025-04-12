@@ -21,16 +21,28 @@ function removeElementsByClass(className, useRankChangeNone = false, insertAfter
   });
 }
 
+function makeProfilePicturesBigger(className) {
+  const elements = document.querySelectorAll(className);
+  elements.forEach(el => {
+    el.style.width = '30px';
+    el.style.height = '30px';
+  })
+}
+
 chrome.storage.sync.get([
   'removeProfilePictures',
+  'makeProfilePicturesBigger',
   'removeTeams',
   'removeRankChanges',
   'removeCountry'
 ], (result) => {
+  const shouldRemoveProfilePics = result.removeProfilePictures || false;
+  const shouldMakePicsBigger = result.makeProfilePicturesBigger || false;
+
   const removalOptions = [
     {
       className: ".avatar.avatar--dynamic-size",
-      enabled: result.removeProfilePictures || false
+      enabled: shouldRemoveProfilePics
     },
     {
       className: ".flag-team",
@@ -54,6 +66,10 @@ chrome.storage.sync.get([
         removeElementsByClass(option.className, option.useRankChangeNone, option.insertAfter);
       }
     });
+
+    if (!shouldRemoveProfilePics && shouldMakePicsBigger) {
+      makeProfilePicturesBigger(".avatar.avatar--dynamic-size");
+    }
   }
 
   runRemovals();

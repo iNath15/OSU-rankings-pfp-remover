@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "No OSU Profile Picture",
+    "name": "OSU Rankings pfp remover",
     "version": "1.0",
-    "description": "Removes profile pictures from the user list.",
+    "description": "Removes profile pictures from the rankings page.",
     "permissions": ["scripting", "activeTab"],
     "content_scripts": [
       {

@@ -13,3 +13,5 @@ This small extension removes the user profile pictures on the osu! ranking page,
 3. **Load the Extension**
     - Click the "Load unpacked" button and select the folder you downloaded or cloned.
     - The extension should now appear in your extensions list and be active.
+    - 
+![how to install extension](https://github.com/user-attachments/assets/07128c1b-9828-4610-beed-75b7a541e8f5)

@@ -8,6 +8,9 @@ This small extension removes the user profile pictures on the osu! ranking page,
     - Remove Teams
     - Remove Ranks Changes
     - Remove Country
+    - ![toggle](https://github.com/user-attachments/assets/93622a87-338f-462c-9818-5533cff8fe9d)
+
+---
 
 ## How to Install
 1. **Download or Clone the Respoitory**

@@ -10,7 +10,7 @@
   ],
   "content_scripts": [
     {
-      "matches": ["*://osu.ppy.sh/*"],
+      "matches": ["*://osu.ppy.sh/rankings/*"],
       "js": ["remove.js"]
     }
   ],

@@ -1,0 +1,2 @@
+# OSU rankings pfp remover
+ 

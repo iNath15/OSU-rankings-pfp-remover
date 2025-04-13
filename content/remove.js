@@ -23,6 +23,22 @@ function removeElementsByClass(className, useRankChangeNone = false, insertAfter
   });
 }
 
+function fixNameContainer() {
+  const mainColumns = document.querySelectorAll(".ranking-page-table__column--main");
+  
+  mainColumns.forEach(column => {
+    column.style.width = "auto";
+    column.style.minWidth = "250px";
+    
+    const nameElement = column.querySelector(".ranking-page-table-main__link-text");
+    if (nameElement) {
+      nameElement.style.maxWidth = "none";
+      nameElement.style.overflow = "visible";
+      nameElement.style.textOverflow = "initial";
+    }
+  });
+}
+
 function makeProfilePicturesBigger(className) {
   const elements = document.querySelectorAll(className);
   elements.forEach(el => {
@@ -38,7 +54,7 @@ function isOnTargetURL() {
   return window.location.href.startsWith(targetURL);
 }
 
-chrome.storage.sync.get([
+chrome.storage.local.get([
   'removeProfilePictures',
   'makeProfilePicturesBigger',
   'removeTeams',
@@ -81,24 +97,30 @@ chrome.storage.sync.get([
     if (!shouldRemoveProfilePics && shouldMakePicsBigger) {
       makeProfilePicturesBigger(".avatar.avatar--dynamic-size");
     }
+    
+    if (result.removeRankChanges) {
+      fixNameContainer();
+    }
   }
 
   runRemovals();
 
-  const observer = new MutationObserver(() => {
-    observer.disconnect();
-    runRemovals();
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  });
+  let observerTimeout;
 
+  const observer = new MutationObserver(() => {
+    if (observerTimeout) return;
+  
+    observerTimeout = setTimeout(() => {
+      runRemovals();
+      observerTimeout = null;
+    }, 200);
+  });
+  
   observer.observe(document.body, {
     childList: true,
     subtree: true
   });
-
+  
   ["popstate", "hashchange"].forEach(event =>
     window.addEventListener(event, runRemovals)
   );

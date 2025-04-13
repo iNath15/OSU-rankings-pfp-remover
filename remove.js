@@ -74,24 +74,5 @@ chrome.storage.sync.get([
 
   runRemovals();
 
-  const observer = new MutationObserver(runRemovals);
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-
   setInterval(runRemovals, 2000);
-
-  ["popstate", "hashchange"].forEach(event =>
-    window.addEventListener(event, runRemovals)
-  );
-
-  document.addEventListener("click", e => {
-    const navTrigger = e.target.closest("a, button");
-    if (navTrigger) {
-      [100, 300, 800].forEach(delay =>
-        setTimeout(runRemovals, delay)
-      );
-    }
-  });
 });

@@ -1,3 +1,5 @@
+const targetURL = "https://osu.ppy.sh/rankings";
+
 function removeElementsByClass(className, useRankChangeNone = false, insertAfterClass = null) {
   const elements = document.querySelectorAll(className);
   elements.forEach(el => {
@@ -27,6 +29,10 @@ function makeProfilePicturesBigger(className) {
     el.style.width = '30px';
     el.style.height = '30px';
   })
+}
+
+function isOnTargetURL() {
+  return window.location.href.startsWith(targetURL);
 }
 
 chrome.storage.sync.get([
@@ -61,6 +67,10 @@ chrome.storage.sync.get([
   ];
 
   function runRemovals() {
+    if (!isOnTargetURL()) {
+      return;
+    }
+
     removalOptions.forEach(option => {
       if (option.enabled) {
         removeElementsByClass(option.className, option.useRankChangeNone, option.insertAfter);

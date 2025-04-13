@@ -38,7 +38,7 @@ function isOnTargetURL() {
   return window.location.href.startsWith(targetURL);
 }
 
-chrome.storage.sync.get([
+chrome.storage.local.get([
   'removeProfilePictures',
   'makeProfilePicturesBigger',
   'removeTeams',
@@ -85,19 +85,22 @@ chrome.storage.sync.get([
 
   runRemovals();
 
-  const observer = new MutationObserver(() => {
-    observer.disconnect();
-    runRemovals();
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  });
+  let observerTimeout;
 
+  const observer = new MutationObserver(() => {
+    if (observerTimeout) return;
+  
+    observerTimeout = setTimeout(() => {
+      runRemovals();
+      observerTimeout = null;
+    }, 200); // adjust delay if needed
+  });
+  
   observer.observe(document.body, {
     childList: true,
     subtree: true
   });
+  
 
   ["popstate", "hashchange"].forEach(event =>
     window.addEventListener(event, runRemovals)

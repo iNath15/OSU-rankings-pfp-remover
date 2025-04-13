@@ -23,6 +23,22 @@ function removeElementsByClass(className, useRankChangeNone = false, insertAfter
   });
 }
 
+function fixNameContainer() {
+  const mainColumns = document.querySelectorAll(".ranking-page-table__column--main");
+  
+  mainColumns.forEach(column => {
+    column.style.width = "auto";
+    column.style.minWidth = "250px";
+    
+    const nameElement = column.querySelector(".ranking-page-table-main__link-text");
+    if (nameElement) {
+      nameElement.style.maxWidth = "none";
+      nameElement.style.overflow = "visible";
+      nameElement.style.textOverflow = "initial";
+    }
+  });
+}
+
 function makeProfilePicturesBigger(className) {
   const elements = document.querySelectorAll(className);
   elements.forEach(el => {
@@ -81,6 +97,10 @@ chrome.storage.local.get([
     if (!shouldRemoveProfilePics && shouldMakePicsBigger) {
       makeProfilePicturesBigger(".avatar.avatar--dynamic-size");
     }
+    
+    if (result.removeRankChanges) {
+      fixNameContainer();
+    }
   }
 
   runRemovals();
@@ -93,7 +113,7 @@ chrome.storage.local.get([
     observerTimeout = setTimeout(() => {
       runRemovals();
       observerTimeout = null;
-    }, 200); // adjust delay if needed
+    }, 200);
   });
   
   observer.observe(document.body, {
@@ -101,7 +121,6 @@ chrome.storage.local.get([
     subtree: true
   });
   
-
   ["popstate", "hashchange"].forEach(event =>
     window.addEventListener(event, runRemovals)
   );

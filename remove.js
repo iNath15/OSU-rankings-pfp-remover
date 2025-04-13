@@ -26,9 +26,12 @@ function removeElementsByClass(className, useRankChangeNone = false, insertAfter
 function makeProfilePicturesBigger(className) {
   const elements = document.querySelectorAll(className);
   elements.forEach(el => {
-    el.style.width = '30px';
-    el.style.height = '30px';
-  })
+    if (!el.classList.contains("profile-big")) {
+      el.style.width = '30px';
+      el.style.height = '30px';
+      el.classList.add("profile-big");
+    }
+  });
 }
 
 function isOnTargetURL() {
@@ -67,9 +70,7 @@ chrome.storage.sync.get([
   ];
 
   function runRemovals() {
-    if (!isOnTargetURL()) {
-      return;
-    }
+    if (!isOnTargetURL()) return;
 
     removalOptions.forEach(option => {
       if (option.enabled) {
@@ -84,13 +85,19 @@ chrome.storage.sync.get([
 
   runRemovals();
 
-  const observer = new MutationObserver(runRemovals);
+  const observer = new MutationObserver(() => {
+    observer.disconnect();
+    runRemovals();
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  });
+
   observer.observe(document.body, {
     childList: true,
     subtree: true
   });
-
-  setInterval(runRemovals, 2000);
 
   ["popstate", "hashchange"].forEach(event =>
     window.addEventListener(event, runRemovals)

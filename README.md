@@ -3,7 +3,7 @@
 This small extension removes the user profile pictures on the osu! ranking page, decluttering the page for a cleaner experience.
 
 > [!NOTE]
-> FireFox Support Added!
+> Firefox Support Added!
 
 ## More Otions Added!
 - Toggle for the following:
@@ -23,7 +23,7 @@ This small extension removes the user profile pictures on the osu! ranking page,
 
 2. **Enable Developer Mode in Chrome (or your browser)**
     - go to `chrome://extensions` (For Chromium Browsers) and toggle the "Developer Mode" switch.
-    - For FireFox go to `about:debugging`
+    - For Firefox go to `about:debugging`
 
 3. **Load the Extension**
     - Click the "Load unpacked" button and select the folder you downloaded or cloned.

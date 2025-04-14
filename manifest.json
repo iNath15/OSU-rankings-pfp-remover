@@ -1,15 +1,12 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "No OSU Profile Picture",
   "version": "2.0",
   "description": "Removes profile pictures from the Rankings and more.",
-  "permissions": [
-    "storage",
-    "activeTab",
-    "*://osu.ppy.sh/*"
-  ],
+  "permissions": ["storage", "scripting", "activeTab"],
+  "host_permissions": ["*://osu.ppy.sh/*"],
   "background": {
-    "scripts": ["background.js"]
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
@@ -17,7 +14,7 @@
       "js": ["content/remove.js"]
     }
   ],
-  "browser_action": {
+  "action": {
     "default_popup": "options/options.html",
     "default_icon": {
       "16": "icons/icon16.png",

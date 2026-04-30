@@ -1,4 +1,7 @@
 <!-- html made by GPT cuz I rlly didn't want to! -->
+<!-- The refactoring for the new version of the manifest was completely done by ChatGPT and Claude,
+ but everything works for me and I'm happy with it.
+ I didn't look at what was in Firefox cuz I rlly didn't want to! -->
 
 <!DOCTYPE html>
 <html>
@@ -9,20 +12,7 @@
 <body>
   <h1>Ranking View Options</h1>
   <div class="container">
-    <label>
-      Remove Profile Pictures
-      <div class="switch">
-        <input type="checkbox" id="pfp">
-        <span class="slider"></span>
-      </div>
-    </label>
-    <label>
-      Make Profile Pictures Bigger
-      <div class="switch">
-        <input type="checkbox" id="pfpSize">
-        <span class="slider"></span>
-      </div>
-    </label>
+    
     <label>
       Remove Teams
       <div class="switch">
@@ -45,7 +35,6 @@
       </div>
     </label>
   </div>
-  <script src="../lib/browser-polyfill.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

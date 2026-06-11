@@ -4,7 +4,8 @@ const targetURLs = [
   "https://osu.ppy.sh/scores",
   "https://osu.ppy.sh/multiplayer",
   "https://osu.ppy.sh/seasons",
-  "https://osu.ppy.sh/home/friends"
+  "https://osu.ppy.sh/home/friends",
+  "https://osu.ppy.sh/users/"
 ];
 
 let currentSettings = {
@@ -72,9 +73,10 @@ function runRemovals() {
 
   const href = window.location.href;
   const isRankings = href.startsWith("https://osu.ppy.sh/rankings");
+  const isUserPage = href.startsWith("https://osu.ppy.sh/users/");
 
   // .flag-team — via global CSS (no MutationObserver or setTimeout hacks needed)
-  setCSSRule('flagTeam', '.flag-team', currentSettings.removeTeams);
+  setCSSRule('flagTeam', '.flag-team', currentSettings.removeTeams && !isUserPage);
 
   if (isRankings) {
     const isGlobalRanking = href.startsWith("https://osu.ppy.sh/rankings/osu/global");

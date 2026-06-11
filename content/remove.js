@@ -17,12 +17,33 @@ function isOnTargetURL() {
   return targetURLs.some(url => window.location.href.startsWith(url));
 }
 
-function toggleElementsByClass(className, shouldHide) {
-  const elements = document.querySelectorAll(className);
-  elements.forEach(el => {
-    el.style.display = shouldHide ? 'none' : '';
-  });
+// --- CSS injection instead of manually iterating over elements ---
+
+const styleEl = document.createElement('style');
+document.head.appendChild(styleEl);
+const sheet = styleEl.sheet;
+
+// Store rule indexes by selector key
+const ruleIndexes = {};
+
+function setCSSRule(key, selector, shouldHide) {
+  // Remove old rule if one exists
+  if (ruleIndexes[key] !== undefined) {
+    sheet.deleteRule(ruleIndexes[key]);
+    delete ruleIndexes[key];
+    // After deletion, indexes shift — recalculate all stored ones
+    Object.keys(ruleIndexes).forEach(k => {
+      if (ruleIndexes[k] > ruleIndexes[key]) ruleIndexes[k]--;
+    });
+  }
+
+  if (shouldHide) {
+    const idx = sheet.insertRule(`${selector} { display: none !important; }`, sheet.cssRules.length);
+    ruleIndexes[key] = idx;
+  }
 }
+
+// --- Logic for hiding rank-change columns (kept via style, because colspan is needed) ---
 
 function toggleRankChangeColumns(shouldHide) {
   const selectors = [
@@ -45,20 +66,27 @@ function toggleRankChangeColumns(shouldHide) {
   });
 }
 
+
 function runRemovals() {
   if (!isOnTargetURL()) return;
 
   const href = window.location.href;
   const isRankings = href.startsWith("https://osu.ppy.sh/rankings");
 
-  toggleElementsByClass(".flag-team", currentSettings.removeTeams);
+  // .flag-team — via global CSS (no MutationObserver or setTimeout hacks needed)
+  setCSSRule('flagTeam', '.flag-team', currentSettings.removeTeams);
 
   if (isRankings) {
     const isGlobalRanking = href.startsWith("https://osu.ppy.sh/rankings/osu/global");
     toggleRankChangeColumns(currentSettings.removeRankChanges && isGlobalRanking);
-    toggleElementsByClass(".flag-country:not(.flag-country--flat)", currentSettings.removeCountry);
+    // .flag-country — also via CSS
+    setCSSRule('flagCountry', '.flag-country:not(.flag-country--flat)', currentSettings.removeCountry);
+  } else {
+    // If navigated away from the rankings page — remove the country rule
+    setCSSRule('flagCountry', '.flag-country:not(.flag-country--flat)', false);
   }
 }
+
 
 function loadSettings(callback) {
   chrome.storage.local.get(
@@ -93,21 +121,27 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-let observerTimeout;
+// --- MutationObserver only for toggleRankChangeColumns (colspan logic) ---
+// .flag-team and .flag-country no longer need manual tracking — CSS will apply to new nodes automatically
+
+let observerTimeout = null;
 
 const observer = new MutationObserver(() => {
   if (observerTimeout) return;
-
   observerTimeout = setTimeout(() => {
-    runRemovals();
+    // Only needed for rank-change columns, which can't be covered by pure CSS
+    const href = window.location.href;
+    if (href.startsWith("https://osu.ppy.sh/rankings")) {
+      const isGlobalRanking = href.startsWith("https://osu.ppy.sh/rankings/osu/global");
+      toggleRankChangeColumns(currentSettings.removeRankChanges && isGlobalRanking);
+    }
     observerTimeout = null;
   }, 200);
 });
 
-observer.observe(document.body, {
-  childList: true,
-  subtree: true
-});
+observer.observe(document.body, { childList: true, subtree: true });
+
+// --- Navigation (SPA) ---
 
 ["popstate", "hashchange"].forEach(evt =>
   window.addEventListener(evt, runRemovals)

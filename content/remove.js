@@ -1,4 +1,11 @@
-const targetURL = "https://osu.ppy.sh/rankings";
+const targetURLs = [
+  "https://osu.ppy.sh/rankings",
+  "https://osu.ppy.sh/beatmapsets",
+  "https://osu.ppy.sh/scores",
+  "https://osu.ppy.sh/multiplayer",
+  "https://osu.ppy.sh/seasons",
+  "https://osu.ppy.sh/home/friends"
+];
 
 let currentSettings = {
   removeTeams: false,
@@ -7,7 +14,7 @@ let currentSettings = {
 };
 
 function isOnTargetURL() {
-  return window.location.href.startsWith(targetURL);
+  return targetURLs.some(url => window.location.href.startsWith(url));
 }
 
 function toggleElementsByClass(className, shouldHide) {
@@ -41,11 +48,16 @@ function toggleRankChangeColumns(shouldHide) {
 function runRemovals() {
   if (!isOnTargetURL()) return;
 
+  const href = window.location.href;
+  const isRankings = href.startsWith("https://osu.ppy.sh/rankings");
+
   toggleElementsByClass(".flag-team", currentSettings.removeTeams);
 
-  toggleRankChangeColumns(currentSettings.removeRankChanges);
-
-  toggleElementsByClass(".flag-country:not(.flag-country--flat)", currentSettings.removeCountry);
+  if (isRankings) {
+    const isGlobalRanking = href.startsWith("https://osu.ppy.sh/rankings/osu/global");
+    toggleRankChangeColumns(currentSettings.removeRankChanges && isGlobalRanking);
+    toggleElementsByClass(".flag-country:not(.flag-country--flat)", currentSettings.removeCountry);
+  }
 }
 
 function loadSettings(callback) {
@@ -62,7 +74,12 @@ function loadSettings(callback) {
   );
 }
 
-loadSettings(runRemovals);
+loadSettings(() => {
+  runRemovals();
+  if (window.location.href.includes("/rankings/ranked-play/")) {
+    setTimeout(runRemovals, 1000);
+  }
+});
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local') return;
@@ -101,5 +118,9 @@ document.addEventListener("click", e => {
     [100, 300, 800].forEach(delay =>
       setTimeout(runRemovals, delay)
     );
+
+    if (window.location.href.includes("/rankings/ranked-play/")) {
+      setTimeout(runRemovals, 1000);
+    }
   }
 });
